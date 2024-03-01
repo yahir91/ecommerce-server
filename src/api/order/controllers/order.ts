@@ -29,7 +29,7 @@ export default factories.createCoreController(
         totalPayment += Number(priceTemp) * product.quantity;
       });
       const charge = await stripe.charges.create({
-        amount: totalPayment * 100,
+        amount: Math.round(totalPayment * 100),
         currency: "eur",
         source: token.id,
         description: `User ID: ${idUser}`,
@@ -42,14 +42,14 @@ export default factories.createCoreController(
         idPayment: charge.id,
         addressShipping,
       };
-      const model = strapi.contentType["api::order:order"];
+      const model = strapi.contentTypes["api::order.order"];
       const validData = await strapi.entityValidator.validateEntityCreation(
         model,
         data as any
       );
 
       const entry = await strapi.db
-        .query("api::order:order")
+        .query("api::order.order")
         .create({ data: validData });
 
       return entry;
